@@ -27,22 +27,54 @@
 				scene = new THREE.Scene();
 
 				
-				
+				var cubes = new Array(40);
+				for (var i = 0; i < 40; i++) {
+				  cubes[i] = new Array(40);
+				}
 				for(i = 0; i < 40; i++){
 					for(j = 0; j < 40; j++){
 					    if(j>i) {
 							var weight = (j+i)*(j-i);
-							weight = (weight > 50 ? 50: weight);
-							var offset = (1/j*i)*5
-
-							var numCubes = Math.floor(Math.random() * weight + offset );
+							weight = (weight > 60 ? 60: weight);
+							var offset = (1/j*i)*3
+							cubes[i][j] = Math.floor(Math.random() * weight + offset );
+						}
+					}
+				}
+				
+				//flatten
+				for(i = 0; i < 40; i++){
+					for(j = 0; j < 40; j++){
+					    if(j>i) {
+							var connectRow = Math.floor(Math.random() +0.5 );
+							var connectColumn;
+							if (connectRow && i > 0) {
+								cubes[i][j] = cubes[i-1][j];
+							}
+							else {
+								connectColumn = Math.floor(Math.random() +0.5 );
+								if (connectColumn && j > 0) {
+									cubes[i][j] = cubes[i][j-1];
+								} 
+							}
+							if (!(connectRow||connectColumn) && i > 10 && j > 10) {
+								cubes[i][j] = (cubes[i][j] + cubes[i-1][j] + cubes[i][j-1]+ cubes[i+1][j] + cubes[i][j+1])/5;
+							}
+						}
+					}
+				}
+				
+				
+				for(i = 0; i < 40; i++){
+					for(j = 0; j < 40; j++){
+					    if(j>i) {
 							//create a cube, set its colour and add it to the scene.
-							var geometry = new THREE.BoxBufferGeometry( 20, 20*numCubes, 20 );
-							var material = new THREE.MeshLambertMaterial( { color: 0x33434C }  );
+							var material = new THREE.MeshPhongMaterial( { color: 0x33434C }  );
+							var geometry = new THREE.BoxBufferGeometry( 20, 20*cubes[i][j], 20 );
 							cube  = new THREE.Mesh( geometry, material );
 							cube.position.x = (i*20-400);
 							cube.position.z = (j*20-400);
-							cube.position.y = (10*numCubes);
+							cube.position.y = (10*cubes[i][j]);
 							scene.add( cube );
 						}
 					}
